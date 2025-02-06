@@ -1,23 +1,27 @@
-SOURCES = $(wildcard *.cpp)
-OBJECTS = $(SOURCES:%.cpp=%.o)
-OUT     = pathtracer
-CXX     = g++
-FLAGS   = -std=c++20 -Wall
+OUT     := pt
+CXX     := g++
+FLAGS   := -std=c++20 -Wall
 
-release: FLAGS += -O3 -DNDEBUG
-release: $(OUT)
+FLAGS_RELEASE := -O3 -DNDEBUG
+COMMAND        = $(CXX) $(FLAGS) $^ -o
 
 debug: FLAGS += -g3 -DDEBUG
-debug: $(OBJECTS)
-	$(CXX) $(FLAGS) $(OBJECTS) -o $(OUT)_debug
+debug: main.o library.o
+	$(COMMAND) $(OUT)
 
-$(OUT): $(OBJECTS)
-	$(CXX) $(FLAGS) $(OBJECTS) -o $(OUT)
+release: FLAGS += -O3 -DNDEBUG
+release: main.o library.o
+	$(COMMAND) $(OUT)_release
+
+reference: FLAGS += -O3 -DNDEBUG
+reference: reference.o library.o
+	$(COMMAND) $(OUT)_reference
 
 %.o: %.cpp
-	$(CXX) $(FLAGS) -c $*.cpp
-
-all: debug release
+	$(CXX) $(FLAGS) -c $<
 
 clean:
-	rm -f $(OBJECTS) $(OUT) $(OUT)_debug
+	rm -f *.o $(OUT)*
+
+.PHONY: clean
+

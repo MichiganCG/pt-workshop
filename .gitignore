@@ -1,8 +1,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c++,macos,xcode,windows,jetbrains+all,visualstudiocode,cmake
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,macos,xcode,windows,jetbrains+all,visualstudiocode,cmake
 
-pathtracer
-pathtracer_debug
+pt*
 *.png
 
 .vscode/

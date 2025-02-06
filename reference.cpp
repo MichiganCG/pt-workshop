@@ -1,6 +1,3 @@
-//#define COMPILE_REFERENCE
-#ifdef COMPILE_REFERENCE
-
 #include "library.hpp"
 
 #include <vector>
@@ -238,4 +235,3 @@ int main()
 	return 0;
 }
 
-#endif

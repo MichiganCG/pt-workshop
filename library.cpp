@@ -309,5 +309,5 @@ void write_image(const std::string& filename, uint32_t width, uint32_t height, c
 	auto casted_width = static_cast<int>(width);
 	auto casted_height = static_cast<int>(height);
 	int result = stbi_write_png(filename.c_str(), casted_width, casted_height, 3, data.data(), 0);
-	if (result == 0) throw std::runtime_error("Error in when outputting image.");
+	if (result == 0) throw std::runtime_error("Error in STB library when outputting image.");
 }
