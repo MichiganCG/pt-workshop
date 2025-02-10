@@ -14,6 +14,35 @@
 using Random = std::default_random_engine;
 thread_local std::unique_ptr<Random> thread_random;
 
+void Image::write_file(const std::string& path) const
+{
+	std::vector<uint8_t> data;
+	data.reserve(width * height * 3);
+
+	auto convert_single = [](float value)
+	{
+		//Gamma correction and clamp
+		float corrected = std::sqrt(std::max(0.0f, std::min(value, 1.0f)));
+		return static_cast<uint8_t>(corrected * std::numeric_limits<uint8_t>::max());
+	};
+
+	for (uint32_t y = 0; y < height; ++y)
+	{
+		for (uint32_t x = 0; x < width; ++x)
+		{
+			auto& pixel = pixels[(height - y - 1) * width + x];
+			data.push_back(convert_single(pixel.x));
+			data.push_back(convert_single(pixel.y));
+			data.push_back(convert_single(pixel.z));
+		}
+	}
+
+	auto casted_width = static_cast<int>(width);
+	auto casted_height = static_cast<int>(height);
+	int result = stbi_write_png(path.c_str(), casted_width, casted_height, 3, data.data(), 0);
+	if (result == 0) throw std::runtime_error("Error in STB library when outputting image.");
+}
+
 void Scene::insert_box(Vec3 center, Vec3 size, uint32_t material)
 {
 	Vec3 extend = size / 2.0f;
@@ -283,31 +312,3 @@ void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_
 	for (auto& thread : threads) thread.join();
 }
 
-void write_image(const std::string& filename, uint32_t width, uint32_t height, const Color* colors)
-{
-	std::vector<uint8_t> data;
-	data.reserve(width * height * 3);
-
-	auto convert_single = [](float value)
-	{
-		//Gamma correction and clamp
-		float corrected = std::sqrt(std::max(0.0f, std::min(value, 1.0f)));
-		return static_cast<uint8_t>(corrected * std::numeric_limits<uint8_t>::max());
-	};
-
-	for (uint32_t y = 0; y < height; ++y)
-	{
-		for (uint32_t x = 0; x < width; ++x)
-		{
-			auto& color = colors[(height - y - 1) * width + x];
-			data.push_back(convert_single(color.x));
-			data.push_back(convert_single(color.y));
-			data.push_back(convert_single(color.z));
-		}
-	}
-
-	auto casted_width = static_cast<int>(width);
-	auto casted_height = static_cast<int>(height);
-	int result = stbi_write_png(filename.c_str(), casted_width, casted_height, 3, data.data(), 0);
-	if (result == 0) throw std::runtime_error("Error in STB library when outputting image.");
-}

@@ -29,6 +29,29 @@ struct Ray
 	Vec3 origin, direction;
 };
 
+using Color = Vec3;
+
+class Image
+{
+public:
+	Image(uint32_t width, uint32_t height) : width(width), height(height), pixels(width * height) {}
+
+	Color get_pixel(uint32_t x, uint32_t y) const { return pixels[get_index(x, y)]; }
+	void set_pixel(uint32_t x, uint32_t y, Color color) { pixels[get_index(x, y)] = color; }
+
+	/**
+	 * Outputs this image as a PNG image file.
+	 */
+	void write_file(const std::string& path) const;
+
+private:
+	uint32_t get_index(uint32_t x, uint32_t y) const { return x + width * y; }
+
+	uint32_t width;
+	uint32_t height;
+	std::vector<Color> pixels;
+};
+
 class Scene
 {
 public:
@@ -58,8 +81,6 @@ private:
 	std::vector<std::tuple<Vec3, float, uint32_t>> planes;
 	std::vector<std::tuple<Vec3, Vec3, uint32_t>> boxes;
 };
-
-using Color = Vec3;
 
 inline Vec3 operator+(Vec3 value, Vec3 other) { return { value.x + other.x, value.y + other.y, value.z + other.z }; }
 inline Vec3 operator-(Vec3 value, Vec3 other) { return { value.x - other.x, value.y - other.y, value.z - other.z }; }
@@ -226,7 +247,3 @@ inline bool is_invalid(Color color) { return not std::isfinite(color.x + color.y
  */
 void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_t)>& action);
 
-/**
- * Outputs a series of colors as a PNG image file.
- */
-void write_image(const std::string& filename, uint32_t width, uint32_t height, const Color* colors);

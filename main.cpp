@@ -1,10 +1,8 @@
-#include "library.hpp"
-
-#include <vector>
+#include "library/library.hpp"
 
 constexpr uint32_t ImageWidth = 512 * 4;
 constexpr uint32_t ImageHeight = 512 * 4;
-constexpr uint32_t SamplesPerPixel = 64 * 16;
+constexpr uint32_t SamplesPerPixel = 1;
 constexpr uint32_t MaxBounces = 128;
 
 Scene make_scene()
@@ -219,19 +217,18 @@ Color render_pixel(uint32_t x, uint32_t y)
 
 int main()
 {
-	std::vector<Color> colors(ImageWidth * ImageHeight);
+	Image image(ImageWidth, ImageHeight);
 
 	parallel_for(0, ImageHeight, [&](uint32_t y)
 	{
 		for (uint32_t x = 0; x < ImageWidth; ++x)
 		{
 			Color color = render_pixel(x, y);
-			size_t index = y * ImageWidth + x;
-			colors[index] = color;
+			image.set_pixel(x, y, color);
 		}
 	});
 
-	write_image("output.png", ImageWidth, ImageHeight, colors.data());
+	image.write_file("output.png");
 	return 0;
 }
 
