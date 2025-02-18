@@ -1,7 +1,7 @@
 #include "library/library.hpp"
 
-const uint32_t ImageWidth = 512;
-const uint32_t ImageHeight = 512;
+const uint32_t ImageWidth = 960;
+const uint32_t ImageHeight = 540;
 
 /**
  * Creates the 3D scene to be rendered.
@@ -10,8 +10,8 @@ Scene make_scene()
 {
 	Scene scene;
 
-	scene.insert_sphere({0.0f, 0.5f, 0.0f}, 0.5f, 0);
-	scene.insert_plane({0.0f, 1.0f, 0.0f}, 0.0f, 0);
+	scene.insert_sphere({0.0f, 0.5f, 0.0f}, 0.5f);
+	scene.insert_plane({0.0f, 1.0f, 0.0f}, 0.0f);
 
 	return scene;
 }

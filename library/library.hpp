@@ -72,7 +72,18 @@ public:
 	/**
 	 * Finds whether a ray intersects with a scene.
 	 * @return Whether the intersection occurred.
-	 * If intersected, also outputs the travelled distance, and surface normal and material.
+	 * If intersected, also outputs the travelled distance, and surface normal.
+	 */
+	bool intersect(const Ray& ray, float& distance, Vec3& normal) const
+	{
+		uint32_t& material;
+		return intersect(ray, distance, normal, material);
+	}
+
+	/**
+	 * Finds whether a ray intersects with a scene.
+	 * @return Whether the intersection occurred.
+	 * If intersected, also outputs the travelled distance, surface normal, and material.
 	 */
 	bool intersect(const Ray& ray, float& distance, Vec3& normal, uint32_t& material) const;
 
