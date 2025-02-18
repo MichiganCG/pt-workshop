@@ -18,6 +18,58 @@ Scene make_scene()
 
 const Scene Scene = make_scene();
 
+Color bsdf(Vec3 outgoing, Vec3 normal, Vec3& incident)
+{
+	incident = random_on_sphere();
+	make_same_side(outgoing, normal, incident);
+	return Color(1.0f);
+}
+
+/**
+ * Determines the amount of light contributed by rays that have escaped the scene.
+ * Note that there are many names for this concept, e.g. environment light, HDRI, sky box.
+ */
+Color escape(Vec3 direction)
+{
+	return direction * direction;
+}
+
+/**
+ * Evaluates one sample of the rendering equation.
+ */
+Color evaluate(const Ray& ray, uint32_t depth)
+{
+	if (depth == 0) return escape(ray.direction);
+
+	float distance;
+	Vec3 normal;
+
+	if (not Scene.intersect(ray, distance, normal)) return escape(ray.direction);
+
+	Vec3 outgoing = -ray.direction;
+	Vec3 incident;
+
+	Color scatter = bsdf(outgoing, normal, incident);
+
+	Ray new_ray = bounce(ray, distance, incident);
+	float lambertian = abs_dot(normal, incident);
+	return scatter * evaluate(new_ray, depth - 1) * lambertian;
+}
+
+/**
+ * Calculates one Monte Carlo integration sample through the camera.
+ */
+Color render_sample(float u, float v)
+{
+	Ray ray;
+
+	//The orientation of the camera determines the orientation of the initial rays
+	ray.origin = Vec3(0.0f, 1.0f, -5.0f);
+	ray.direction = normalize(Vec3(u, v, 1.0f));
+
+	return evaluate(ray, MaxBounces);
+}
+
 /**
  * Calculates the color value to output for a pixel.
  */
