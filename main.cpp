@@ -10,13 +10,13 @@ Scene make_scene()
 {
 	Scene scene;
 
-	scene.insert_sphere({0.0f, 0.5f, 0.0f}, 0.5f);
+	scene.insert_sphere({0.0f, 1.0f, 0.0f}, 1.0f);
 	scene.insert_plane({0.0f, 1.0f, 0.0f}, 0.0f);
 
 	return scene;
 }
 
-const Scene scene = make_scene();
+const Scene Scene = make_scene();
 
 /**
  * Calculates the color value to output for a pixel.
@@ -29,7 +29,6 @@ Color render_pixel(uint32_t x, uint32_t y)
 	float v = (static_cast<float>(y) - ImageHeight / 2.0f) / ImageWidth;
 
 	result = Color(u, v, 1.0f);
-
 	return result;
 }
 
