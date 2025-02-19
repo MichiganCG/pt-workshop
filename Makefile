@@ -3,12 +3,12 @@ CXX    := g++
 FLAGS  := -std=c++20 -Wall
 COMMAND = $(CXX) $(FLAGS) $^ -o
 
-debug: FLAGS += -g3 -DDEBUG
-debug: main.cpp library.o
+$(OUT): FLAGS += -g3 -DDEBUG
+$(OUT): main.cpp library.o
 	$(COMMAND) $(OUT)
 
-release: FLAGS += -O3 -DNDEBUG
-release: main.cpp library.o
+$(OUT)_release: FLAGS += -O3 -DNDEBUG
+$(OUT)_release: main.cpp library.o
 	$(COMMAND) $(OUT)_release
 
 library.o: library/library.cpp
