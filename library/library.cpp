@@ -4,12 +4,13 @@
 
 #include "stb_image_write.h"
 
-#include <stdexcept>
-#include <vector>
-#include <random>
-#include <thread>
+#include <algorithm>
 #include <atomic>
 #include <iostream>
+#include <random>
+#include <stdexcept>
+#include <thread>
+#include <vector>
 
 using Random = std::default_random_engine;
 thread_local std::unique_ptr<Random> thread_random;
@@ -281,9 +282,16 @@ Vec3 fresnel_refract(float eta, float cos_i, Vec3 outgoing, Vec3 normal)
 	return normalize(normal * (eta * cos_o + cos_i) - outgoing * eta);
 }
 
-void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_t)>& action)
+void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_t)>& action, bool show_progress)
 {
-	if (end == begin) return;
+	auto print_done = [show_progress]() { if (show_progress) std::printf("\rdone\n"); };
+
+	if (end == begin)
+	{
+		print_done();
+		return;
+	}
+
 	if (end < begin) std::swap(begin, end);
 
 	uint32_t workers = std::thread::hardware_concurrency();
@@ -306,9 +314,28 @@ void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_
 			}
 		};
 
-		threads.emplace_back(entry);
+		auto entry_print = [begin, end, &current, &action]()
+		{
+			make_random_engine(0);
+
+			while (true)
+			{
+				uint32_t index = current++;
+				if (index >= end) break;
+
+				uint32_t done = index - begin;
+				uint32_t total = end - begin;
+				std::printf("\r%5.2f %%", static_cast<float>(done) / total * 100.0f);
+
+				action(index);
+			}
+		};
+
+		if (i > 0 || not show_progress) threads.emplace_back(entry);
+		else threads.emplace_back(entry_print);
 	}
 
 	for (auto& thread : threads) thread.join();
+	print_done();
 }
 

@@ -76,7 +76,7 @@ public:
 	 */
 	bool intersect(const Ray& ray, float& distance, Vec3& normal) const
 	{
-		uint32_t& material;
+		uint32_t material;
 		return intersect(ray, distance, normal, material);
 	}
 
@@ -252,9 +252,10 @@ inline bool is_invalid(Color color) { return not std::isfinite(color.x + color.y
 
 /**
  * Executes an action in parallel, taking advantage of multiple threads.
+ * Also optionally prints the execution progress in standard out.
  * @param begin The first index to execute (inclusive).
  * @param end One past the last index to execute (exclusive).
  * @param action The action to execute in parallel.
  */
-void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_t)>& action);
+void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_t)>& action, bool show_progress = true);
 
