@@ -284,11 +284,11 @@ Vec3 fresnel_refract(float eta, float cos_i, Vec3 outgoing, Vec3 normal)
 
 void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_t)>& action, bool show_progress)
 {
-	auto print_done = [show_progress]() { if (show_progress) std::printf("\rdone\n"); };
+	auto print_done = []() { std::printf("\r       \rdone\n"); };
 
 	if (end == begin)
 	{
-		print_done();
+		if (show_progress) print_done();
 		return;
 	}
 
@@ -326,6 +326,7 @@ void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_
 				uint32_t done = index - begin;
 				uint32_t total = end - begin;
 				std::printf("\r%5.2f %%", static_cast<float>(done) / total * 100.0f);
+				std::cout << std::flush;
 
 				action(index);
 			}
@@ -336,6 +337,6 @@ void parallel_for(uint32_t begin, uint32_t end, const std::function<void(uint32_
 	}
 
 	for (auto& thread : threads) thread.join();
-	print_done();
+	if (show_progress) print_done();
 }
 
