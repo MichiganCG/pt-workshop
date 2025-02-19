@@ -2,6 +2,8 @@
 
 const uint32_t ImageWidth = 960;
 const uint32_t ImageHeight = 540;
+const uint32_t SamplesPerPixel = 64;
+const uint32_t MaxBounces = 128;
 
 /**
  * Creates the 3D scene to be rendered.
@@ -18,6 +20,9 @@ Scene make_scene()
 
 const Scene Scene = make_scene();
 
+/**
+ * Calculates the scattering factor at a particular intersection configuration.
+ */
 Color bsdf(Vec3 outgoing, Vec3 normal, Vec3& incident)
 {
 	incident = random_on_sphere();
@@ -65,7 +70,7 @@ Color render_sample(float u, float v)
 
 	//The orientation of the camera determines the orientation of the initial rays
 	ray.origin = Vec3(0.0f, 1.0f, -5.0f);
-	ray.direction = normalize(Vec3(u, v, 1.0f));
+	ray.direction = normalize(Vec3(u, v, 0.8f));
 
 	return evaluate(ray, MaxBounces);
 }
@@ -80,8 +85,13 @@ Color render_pixel(uint32_t x, uint32_t y)
 	float u = (static_cast<float>(x) - ImageWidth / 2.0f) / ImageWidth;
 	float v = (static_cast<float>(y) - ImageHeight / 2.0f) / ImageWidth;
 
-	result = Color(u, v, 1.0f);
-	return result;
+	for (uint32_t i = 0; i < SamplesPerPixel; ++i)
+	{
+		Color sample = render_sample(u, v);
+		result = result + sample;
+	}
+
+	return result / SamplesPerPixel;
 }
 
 int main()
